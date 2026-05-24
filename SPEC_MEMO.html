@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>仕様詳細メモ | 三田市クリーンセンター予約システム</title>
+<style>
+  :root {
+    --navy: #1E3A5F;
+    --navy-light: #2A4F7F;
+    --ink: #1F2937;
+    --ink-sub: #6B7280;
+    --border: #E5E7EB;
+    --bg: #FFFFFF;
+    --bg-sub: #F8F9FA;
+    --accent: #C0392B;
+    --ok: #2E7D5B;
+    --amber: #B7791F;
+    --tag-blue: #EFF6FF;
+    --tag-blue-text: #1E40AF;
+    --tag-red: #FEF2F2;
+    --tag-red-text: #991B1B;
+    --tag-green: #F0FDF4;
+    --tag-green-text: #166534;
+    --tag-amber: #FFFBEB;
+    --tag-amber-text: #92400E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    background: var(--bg);
+  }
+
+  /* Layout */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 0;
+  }
+
+  .sidebar-title {
+    color: #CADCFC;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 8px;
+  }
+
+  .sidebar nav a {
+    display: block;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    padding: 8px 20px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+
+  .sidebar nav a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    border-left-color: #CADCFC;
+  }
+
+  /* Main */
+  .main {
+    flex: 1;
+    max-width: 900px;
+    padding: 48px 56px;
+  }
+
+  /* Header */
+  .doc-header {
+    border-bottom: 2px solid var(--navy);
+    padding-bottom: 24px;
+    margin-bottom: 48px;
+  }
+
+  .doc-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .doc-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  .doc-meta {
+    font-size: 12px;
+    color: var(--ink-sub);
+    display: flex;
+    gap: 24px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-num {
+    width: 28px;
+    height: 28px;
+    background: var(--navy);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 28px 0 12px;
+    padding-left: 10px;
+    border-left: 3px solid var(--navy);
+  }
+
+  p { margin-bottom: 12px; color: var(--ink); }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  tbody tr:nth-child(even) { background: var(--bg-sub); }
+
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  /* Code / Pre */
+  pre {
+    background: #0F172A;
+    color: #E2E8F0;
+    padding: 20px 24px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  code {
+    background: var(--bg-sub);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .tag-confirmed { background: var(--tag-green); color: var(--tag-green-text); }
+  .tag-tbd { background: var(--tag-amber); color: var(--tag-amber-text); }
+  .tag-required { background: var(--tag-red); color: var(--tag-red-text); }
+  .tag-optional { background: var(--tag-blue); color: var(--tag-blue-text); }
+
+  /* Decision box */
+  .decision {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--navy);
+    background: var(--bg-sub);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .decision-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--navy);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .decision p { margin: 0; font-size: 13px; }
+
+  /* Warning box */
+  .warning {
+    border: 1px solid #FDE68A;
+    border-left: 4px solid var(--amber);
+    background: var(--tag-amber);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .warning-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .warning p { margin: 0; font-size: 13px; }
+
+  /* Flow */
+  .flow {
+    background: #0F172A;
+    color: #E2E8F0;
+    padding: 20px 24px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.9;
+    margin-bottom: 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    white-space: pre;
+  }
+
+  /* List */
+  ul, ol {
+    padding-left: 20px;
+    margin-bottom: 12px;
+  }
+
+  li { margin-bottom: 4px; font-size: 13px; }
+
+  /* Divider */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* Status icons */
+  .ok::before { content: "✓ "; color: var(--ok); font-weight: 700; }
+  .ng::before { content: "✕ "; color: var(--accent); font-weight: 700; }
+  .tbd::before { content: "△ "; color: var(--amber); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-title">目次</div>
+    <nav>
+      <a href="#s1">1. システム概要</a>
+      <a href="#s2">2. 認証設計</a>
+      <a href="#s3">3. 入力項目</a>
+      <a href="#s4">4. 予約フロー</a>
+      <a href="#s5">5. 受付番号・QR</a>
+      <a href="#s6">6. メール通知</a>
+      <a href="#s7">7. 管理画面</a>
+      <a href="#s8">8. 外部連携</a>
+      <a href="#s9">9. セキュリティ</a>
+      <a href="#s10">10. 多言語</a>
+      <a href="#s11">11. 未確定事項</a>
+      <a href="#s12">12. Figmaファイル</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <header class="doc-header">
+      <div class="doc-label">Claude Code 引き継ぎ資料</div>
+      <h1 class="doc-title">持込ごみ予約システム<br>仕様詳細メモ</h1>
+      <div class="doc-meta">
+        <span>三田市クリーンセンター</span>
+        <span>作成: 2026-05-19</span>
+        <span>株式会社令和の軍師</span>
+      </div>
+    </header>
+
+    <!-- 1. システム概要 -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <h2 class="section-title">システム概要</h2>
+      </div>
+
+      <h3>成果物</h3>
+      <p><strong>1つの予約専用サイト</strong>（三田市クリーンセンター）を構築する。公式HP = 予約サイト（1つのLaravelアプリ）。三田市役所の本来のサイトは別途存在（既存・本案件範囲外）。</p>
+
+      <div class="flow">[三田市役所サイト（既存）] ──link──▶ [本サイト（本案件の成果物）]</div>
+
+      <h3>技術スタック（確定）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>採用</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>言語</td><td><code>PHP 8.2+</code></td><td>設計書通り</td></tr>
+            <tr><td>FW</td><td><code>Laravel 11 (LTS)</code></td><td>認証・Queue・Scheduler・監査ログが標準装備</td></tr>
+            <tr><td>DB</td><td><code>MySQL 8.x</code></td><td>設計書通り</td></tr>
+            <tr><td>インフラ</td><td>Xserver VPS</td><td>メーカ管理・24/365監視</td></tr>
+            <tr><td>フロント</td><td>SCSS + Vanilla JS</td><td>必要時 Alpine.js</td></tr>
+            <tr><td>メール</td><td>SendGrid</td><td>SPF/DKIM/DMARC</td></tr>
+            <tr><td>Bot対策</td><td>reCAPTCHA v3</td><td></td></tr>
+            <tr><td>QR</td><td>endroid/qr-code</td><td>PHP定番</td></tr>
+            <tr><td>監査ログ</td><td>spatie/laravel-activitylog</td><td>Laravel定番</td></tr>
+            <tr><td>CSV</td><td>league/csv</td><td>計量システム連携</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>サイト構成</h3>
+      <div class="flow">持込予約サイト（Laravel 1つのアプリ）
+├── /              トップ（施設案内・利用ガイド・注意事項・同意）
+├── /form          予約フォーム
+├── /confirm       内容確認
+├── /done          予約完了（受付番号・QRコード）
+├── /mypage        予約確認・変更・取消
+├── /policy        プライバシーポリシー
+└── /admin         管理画面
+      ├── ログイン
+      ├── ダッシュボード
+      ├── 予約管理（一覧・詳細・CSV出力）
+      ├── 受付枠設定
+      ├── 品目マスタ
+      ├── お知らせ管理
+      ├── 管理者設定
+      └── ログ閲覧</div>
+    </section>
+
+    <!-- 2. 認証設計 -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <h2 class="section-title">認証設計</h2>
+      </div>
+
+      <div class="decision">
+        <div class="decision-label">確定方針</div>
+        <p>利用者側は<strong>会員登録なし</strong>。受付番号 + 電話番号認証を基本とする。</p>
+      </div>
+
+      <h3>会員登録なしの根拠</h3>
+      <ul>
+        <li>仕様書11「メールアドレスを持たない人も簡単に予約変更等できること」</li>
+        <li>設計書「会員登録不要で簡単に予約可能」</li>
+        <li>ごみ持込は低頻度サービス（年数回）、会員登録のメリットが薄い</li>
+        <li>高齢者を含む全市民が対象、ID/PW管理が壁になる</li>
+        <li>個人情報の長期保管リスクを最小化</li>
+      </ul>
+
+      <h3>利用者の認証フロー</h3>
+      <div class="flow">【パターンA: メール持ちユーザー（主な導線）】
+確認メール内のマジックリンク（ワンタッチ）
+    ↓
+予約内容表示
+    ↓
+変更・取消ボタン押下 → 電話番号入力（本人確認）→ 実行
+
+【パターンB: メール無しユーザー（仕様書11対応）】
+/mypage → 受付番号 + 電話番号 入力 → 予約内容表示 → 変更・取消実行</div>
+
+      <h3>受付番号を忘れた場合</h3>
+      <div class="decision">
+        <div class="decision-label">確定方針</div>
+        <p>施設に電話 → 受付員が管理画面で検索 → 代理対応（仕様書12の代理入力機能で吸収）。<br>
+        システム側での自己解決手段は設けない。注意事項ページで保管を促す文言を表示する。</p>
+      </div>
+
+      <h3>マジックリンクの仕様</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>仕様</th></tr></thead>
+          <tbody>
+            <tr><td>トークン形式</td><td>推測不可能なランダム文字列（64文字以上）</td></tr>
+            <tr><td>有効期限</td><td>持込日まで（持込日翌日に無効化）</td></tr>
+            <tr><td>使い捨て</td><td>何度でもアクセス可能</td></tr>
+            <tr><td>変更・取消</td><td>マジックリンク後、追加で電話番号入力が必要</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>QRコードの用途</h3>
+      <div class="decision">
+        <div class="decision-label">確定方針</div>
+        <p><strong>主目的は現地受付での予約照合</strong>（施設側がスキャン）。マジックリンクとは別用途。QRには受付番号をエンコード（URLではなくテキスト）。変更・取消はQRからではなくマイページ経由。</p>
+      </div>
+
+      <h3>2回目以降の入力省略（仕様書10）</h3>
+      <div class="flow">新規予約フォーム → 電話番号入力
+    ↓
+過去に同じ電話番号で予約あり？
+    ├─ Yes → 氏名・住所等を自動入力（編集可）
+    └─ No  → 通常入力</div>
+      <p>明示的なログイン・パスワード不要。設計書「会員登録不要」と整合。</p>
+
+      <h3>管理者側</h3>
+      <p>ID / パスワード認証（Figmaでログイン画面が設計済み: <code>node-id=85:1329</code>）。パスワード忘れはシステム管理者に問い合わせ。</p>
+    </section>
+
+    <!-- 3. 入力項目 -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <h2 class="section-title">入力項目（仕様書基本5）</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>必須/任意</th><th>備考</th></tr></thead>
+          <tbody>
+            <tr><td>氏名</td><td><span class="tag tag-required">必須</span></td><td></td></tr>
+            <tr><td>住所（郵便番号・市町村・地区名）</td><td><span class="tag tag-required">必須</span></td><td>郵便番号→住所自動補完</td></tr>
+            <tr><td>電話番号</td><td><span class="tag tag-required">必須</span></td><td>認証・過去情報呼び出しに使用</td></tr>
+            <tr><td>メールアドレス</td><td><span class="tag tag-optional">任意</span></td><td>仕様書11によりメール無しでも予約可</td></tr>
+            <tr><td>持込日</td><td><span class="tag tag-required">必須</span></td><td>カレンダーUI</td></tr>
+            <tr><td>持込時間帯</td><td><span class="tag tag-required">必須</span></td><td>1時間単位</td></tr>
+            <tr><td>搬入回数</td><td><span class="tag tag-required">必須</span></td><td></td></tr>
+            <tr><td>搬入種別</td><td><span class="tag tag-required">必須</span></td><td>家庭 / 事業</td></tr>
+            <tr><td>ごみ発生場所</td><td><span class="tag tag-required">必須</span></td><td></td></tr>
+            <tr><td>品目</td><td><span class="tag tag-required">必須</span></td><td>分類・50音・キーワード検索で選択</td></tr>
+            <tr><td>持ち込むごみの総量</td><td><span class="tag tag-required">必須</span></td><td></td></tr>
+            <tr><td>搬入時の車両</td><td><span class="tag tag-required">必須</span></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warning">
+        <div class="warning-label">注意</div>
+        <p>詳細項目は詳細設計時に確定（仕様書に明記）。メールアドレスは仕様書5で入力項目として記載されているが、仕様書11と設計書により「任意」と判断。</p>
+      </div>
+    </section>
+
+    <!-- 4. 予約フロー -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <h2 class="section-title">予約フロー</h2>
+      </div>
+
+      <h3>利用者フロー（7画面）</h3>
+      <div class="flow">TOP (/)
+└── 利用ガイド / 注意事項 / 利用規約同意
+    ↓ 同意して予約開始
+予約フォーム (/form)
+├── Step1: 利用者情報（氏名・連絡先・住所）
+├── Step2: 日時選択（カレンダー・時間帯）
+└── Step3: 品目選択（分類/50音/キーワード検索）
+    ↓
+内容確認 (/confirm) → 修正可能
+    ↓
+予約完了 (/done)
+└── 受付番号 + QRコード表示
+└── 確認メール自動送信（メールあり利用者のみ）
+
+マイページ (/mypage)
+└── 受付番号 + 電話番号 入力（認証）
+└── 予約内容表示
+└── 変更 or 取消</div>
+
+      <h3>変更できる項目（仕様書基本6）</h3>
+      <ul>
+        <li>品目の追加・取消</li>
+        <li>持込日</li>
+        <li>持込時間帯</li>
+      </ul>
+
+      <h3>受付枠制御</h3>
+      <ul>
+        <li>上限到達した日・時間帯はカレンダーで選択不可（グレーアウト）</li>
+        <li>一般/事業系で<strong>別々に</strong>上限管理（仕様書基本7）</li>
+        <li>1時間単位で時間帯選択</li>
+      </ul>
+    </section>
+
+    <!-- 5. 受付番号・QR -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <h2 class="section-title">受付番号・QRコード（仕様書基本15）</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>仕様</th><th>状態</th></tr></thead>
+          <tbody>
+            <tr><td>発行タイミング</td><td>予約完了時</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+            <tr><td>受付番号体系</td><td>例: <code>R-0513-001</code>（Figmaサンプル）</td><td><span class="tag tag-tbd">未確定</span></td></tr>
+            <tr><td>リセット単位</td><td>年/月/週 で管理画面から設定可能</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+            <tr><td>QRの内容</td><td>受付番号テキスト（URLではない）</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+            <tr><td>QRの主用途</td><td>現地受付での予約照合・計量システム連携</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+            <tr><td>確認メールへの記載</td><td>受付番号・QRコード・マジックリンク</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. メール通知 -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <h2 class="section-title">メール通知（仕様書基本8・16・17）</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>トリガー</th><th>送信先</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>新規予約完了</td><td>利用者（メールあり）</td><td>受付内容・受付番号・QRコード・マジックリンク</td></tr>
+            <tr><td>予約変更</td><td>利用者（メールあり）</td><td>変更後の内容</td></tr>
+            <tr><td>予約取消</td><td>利用者（メールあり）</td><td>取消の確認</td></tr>
+            <tr><td>持込前日</td><td>利用者（メールあり）</td><td>リマインド（cron で自動送信）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>メールアドレス未登録の利用者にはメール送信しない（エラーにもしない）。送信: SendGrid（外部SMTP）+ SPF/DKIM/DMARC。</p>
+    </section>
+
+    <!-- 7. 管理画面 -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <h2 class="section-title">管理画面</h2>
+      </div>
+
+      <h3>Figmaで設計済みの画面（<code>node-id=1:4</code>）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>画面名</th><th>主な機能</th><th>Figma node-id</th></tr></thead>
+          <tbody>
+            <tr><td>ログイン</td><td>ID/PW認証、ログイン状態保持</td><td><code>85:1329</code></td></tr>
+            <tr><td>ダッシュボード</td><td>本日の予約数・空き枠・未確認件数・今月合計</td><td><code>85:930</code></td></tr>
+            <tr><td>予約管理</td><td>一覧・検索・フィルター・CSV出力</td><td><code>85:1073</code></td></tr>
+            <tr><td>予約詳細</td><td>ステータス変更・内部メモ・操作ログ</td><td><code>85:1245</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Figmaにメニューはあるが画面未設計（追加実装必要）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>機能</th><th>内容</th><th>仕様書</th></tr></thead>
+          <tbody>
+            <tr><td>受付枠設定</td><td>一括設定（施設・期間・曜日）+ 個別設定（1日・時間帯）+ 家庭/事業別管理</td><td>管理1</td></tr>
+            <tr><td>お知らせ管理</td><td>注意事項の編集（日英両言語）、プレビュー、公開/下書き</td><td>基本18</td></tr>
+            <tr><td>品目マスタ</td><td>分類・名称・手数料・適用月・持込可否の編集</td><td>管理2</td></tr>
+            <tr><td>代理入力フォーム</td><td>受付員が利用者に代わって予約登録・変更・取消、メール送信ON/OFF</td><td>基本12</td></tr>
+            <tr><td>ログ閲覧</td><td>ログイン履歴・個人情報アクセス監査ログ</td><td>基本20</td></tr>
+            <tr><td>受付番号リセット設定</td><td>年/月/週の切替</td><td>基本15</td></tr>
+            <tr><td>管理者設定</td><td>権限管理等</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>代理入力機能（仕様書基本12）</h3>
+      <ul>
+        <li>TEL受付員が利用者に代わって入力</li>
+        <li>当日持込（原則禁止）の現場登録にも使用</li>
+        <li>確認メール送信のON/OFF切替可能</li>
+        <li>代理入力者が後から変更・取消も可能</li>
+        <li>受付員ログイン済みの管理画面から操作</li>
+        <li><strong>受付番号忘れ対応もここで吸収</strong>（利用者から電話→受付員が代理変更）</li>
+      </ul>
+    </section>
+
+    <!-- 8. 外部連携 -->
+    <section class="section" id="s8">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <h2 class="section-title">外部連携</h2>
+      </div>
+
+      <h3>計量システム連携（仕様書管理4）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>内容</th><th>状態</th></tr></thead>
+          <tbody>
+            <tr><td>計量システム</td><td>他社・範囲外</td><td>—</td></tr>
+            <tr><td>連携方式</td><td>CSV形式で受付情報を出力・取込</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+            <tr><td>CSV仕様</td><td>計量システム側の指定に従う</td><td><span class="tag tag-required">先方確認待ち</span></td></tr>
+            <tr><td>警告データ</td><td>予約外搬入者への警告データも提供</td><td><span class="tag tag-confirmed">確定</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>郵便番号API</h3>
+      <p>郵便番号入力で住所自動補完（仕様書基本9）。</p>
+    </section>
+
+    <!-- 9. セキュリティ -->
+    <section class="section" id="s9">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <h2 class="section-title">セキュリティ</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>対応</th></tr></thead>
+          <tbody>
+            <tr><td>通信</td><td>HTTPS（SSL/TLS）</td></tr>
+            <tr><td>不正アクセス</td><td>WAF</td></tr>
+            <tr><td>Bot対策</td><td>reCAPTCHA v3</td></tr>
+            <tr><td>メール認証</td><td>SPF/DKIM/DMARC</td></tr>
+            <tr><td>監査ログ</td><td>ログイン履歴・個人情報アクセス履歴</td></tr>
+            <tr><td>バックアップ</td><td>定期自動バックアップ</td></tr>
+            <tr><td>ペネトレーションテスト</td><td>初回リリース前 + ソフト更新時</td></tr>
+            <tr><td>個人情報</td><td>収集最小限・保存期間設定・不要データ削除</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10. 多言語 -->
+    <section class="section" id="s10">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <h2 class="section-title">多言語対応（仕様書基本19）</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>対象</th><th>日本語</th><th>英語</th></tr></thead>
+          <tbody>
+            <tr><td>画面UI</td><td>◯</td><td>◯</td></tr>
+            <tr><td>確認メール本文</td><td>◯</td><td>◯</td></tr>
+            <tr><td>管理画面</td><td>◯</td><td><span class="tag tag-tbd">要確認</span></td></tr>
+            <tr><td>注意事項・ポリシー</td><td>◯</td><td><span class="tag tag-tbd">要確認</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Laravel localization で実装。</p>
+    </section>
+
+    <!-- 11. 未確定事項 -->
+    <section class="section" id="s11">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <h2 class="section-title">未確定事項</h2>
+      </div>
+
+      <h3>チーム内で詰める</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>論点</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>受付番号の体系（フォーマット・桁数）</td></tr>
+            <tr><td>2</td><td>受付番号リセット単位のデフォルト（年/月/週）</td></tr>
+            <tr><td>3</td><td>マジックリンクのトークン有効期限の詳細</td></tr>
+            <tr><td>4</td><td>品目マスタの実件数・分類階層数</td></tr>
+            <tr><td>5</td><td>料金計算ロジック（品目×数量？重量ベース？）</td></tr>
+            <tr><td>6</td><td>手数料の支払方法（現地払いのみ？）</td></tr>
+            <tr><td>7</td><td>スマホ専用画面の定義（レスポンシブか別UIか）</td></tr>
+            <tr><td>8</td><td>家庭/事業の合算上限ロジックの有無</td></tr>
+            <tr><td>9</td><td>管理画面の多言語対応有無</td></tr>
+            <tr><td>10</td><td>監査ログの保存期間・ISO27001統制項目の特定</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>先方（計量システムベンダー）に確認が必要</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>確認事項</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>CSV仕様（文字コード・列定義・ファイル名・伝送方式）</td></tr>
+            <tr><td>2</td><td>QRコードと計量システムの連携方式</td></tr>
+            <tr><td>3</td><td>連携タイミング（常時接続 or バッチ）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 12. Figma -->
+    <section class="section" id="s12">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <h2 class="section-title">Figmaファイル</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>項目</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>URL</td><td><a href="https://www.figma.com/design/VvNA3XlxpMxGotSD62anNn/" target="_blank">三田市クリーンセンター</a></td></tr>
+            <tr><td>fileKey</td><td><code>VvNA3XlxpMxGotSD62anNn</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>ページ構成</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>node-id</th><th>ページ名</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td><code>1:3</code></td><td>02_利用者</td><td>TOP / form / confirm / complete × PC(1440) + スマホ(390)</td></tr>
+            <tr><td><code>1:4</code></td><td>03_管理画面</td><td>ログイン / ダッシュボード / 予約管理 / 予約詳細 × PC(1440)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>管理画面の主要フレーム</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>node-id</th><th>フレーム名</th></tr></thead>
+          <tbody>
+            <tr><td><code>85:1329</code></td><td>ログイン（PC）</td></tr>
+            <tr><td><code>85:930</code></td><td>ダッシュボード（PC）</td></tr>
+            <tr><td><code>85:1073</code></td><td>予約管理（PC）</td></tr>
+            <tr><td><code>85:1245</code></td><td>予約詳細（PC）</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>
